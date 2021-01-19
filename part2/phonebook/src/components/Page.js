@@ -57,10 +57,7 @@ const Page = (props) => {
 	return (
 		<div>
 			<Header text="Phonebook" />
-			<Notification
-				message={props.errorMessage}
-				type={props.messageType}
-			/>
+			<Notification message={props.errorMessage} type={props.messageType} />
 
 			<Input
 				text="filter shown with"
@@ -77,11 +74,7 @@ const Page = (props) => {
 			{props.persons
 				.filter((x) => new RegExp(props.filter, "i").test(x.name))
 				.map((x) => (
-					<Entry
-						key={x.name}
-						obj={x}
-						deleteHandler={props.deleteHandler}
-					/>
+					<Entry key={x.name} obj={x} deleteHandler={props.deleteHandler} />
 				))}
 		</div>
 	);

@@ -40,7 +40,8 @@ blogRouter.delete('/:id', async (request, response) => {
   }
   const blog = await Blog.findById(request.params.id);
   if (decodedToken.id === blog.user.toString()) {
-    await Blog.findOneAndRemove(request.params.id);
+    console.log('removing this blog', blog);
+    await blog.remove();
     response.status(204).end();
   } else {
     return response.status(401).json({ error: 'invalid token' });

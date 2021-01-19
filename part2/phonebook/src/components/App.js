@@ -34,11 +34,18 @@ const App = () => {
 
 	const createNewEntry = () => {
 		const obj = { name: newName, number: newNumber };
-		personServices.create(obj).then((response) => {
-			setPersons([...persons, response]);
-			setError(`Added ${obj.name}`);
-			setSuccess(true);
-		});
+		personServices
+			.create(obj)
+			.then((response) => {
+				setPersons([...persons, response]);
+				setError(`Added ${obj.name}`);
+				setSuccess(true);
+			})
+			.catch((body) => {
+				console.log(body.response.data);
+				setError(`${body.response.data.error}`);
+				setSuccess(false);
+			});
 	};
 
 	const resetState = () => {
@@ -62,9 +69,7 @@ const App = () => {
 					.update(p.id, { ...p, number: newNumber })
 					.then((response) =>
 						setPersons(
-							persons.map((person) =>
-								person.id !== p.id ? person : response
-							)
+							persons.map((person) => (person.id !== p.id ? person : response))
 						)
 					)
 					.catch((error) => {
