@@ -1,25 +1,36 @@
 import React from "react";
 import { vote } from "../reducers/anecdoteReducer";
-import { useSelector, useDispatch } from "react-redux";
+import { notifyVote, clearNotification } from "../reducers/notificationReducer";
+import { connect } from "react-redux";
 
-const AnecdoteList = () => {
-	const anecdotes = useSelector((state) => state);
-	const dispatch = useDispatch();
+var timeoutID;
+const AnecdoteList = (props) => {
+	const anecdotes = props.anecdotes;
+	const filter = props.filter;
 
-	const handleVote = (id) => {
-		dispatch(vote(id));
+	const handleVote = (anecdote) => {
+		if (timeoutID !== null) {
+			window.clearTimeout(timeoutID);
+		}
+		props.vote(anecdote.id);
+		props.notifyVote(anecdote.content);
+		timeoutID = setTimeout(() => {
+			props.clearNotification();
+			timeoutID = null;
+		}, 5000);
 	};
 
 	return (
 		<div>
 			{anecdotes
+				.filter((x) => new RegExp(filter, "i").test(x.content))
 				.sort((a, b) => b.votes - a.votes)
 				.map((anecdote) => (
 					<div key={anecdote.id}>
 						<div>{anecdote.content}</div>
 						<div>
 							has {anecdote.votes}
-							<button onClick={() => handleVote(anecdote.id)}>vote</button>
+							<button onClick={() => handleVote(anecdote)}>vote</button>
 						</div>
 					</div>
 				))}
@@ -27,4 +38,21 @@ const AnecdoteList = () => {
 	);
 };
 
-export default AnecdoteList;
+const mapStateToProps = (state) => {
+	return {
+		anecdotes: state.anecdote,
+		filter: state.filter,
+	};
+};
+
+const mapDispatchToProps = {
+	vote,
+	notifyVote,
+	clearNotification,
+};
+
+const ConnectedAnecodteList = connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(AnecdoteList);
+export default ConnectedAnecodteList;

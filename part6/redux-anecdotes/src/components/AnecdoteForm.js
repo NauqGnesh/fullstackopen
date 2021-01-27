@@ -1,15 +1,26 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { connect } from "react-redux";
 import { createAnecdote } from "../reducers/anecdoteReducer";
+import {
+	notifyNewAnecdote,
+	clearNotification,
+} from "../reducers/notificationReducer";
 
-const AnecdoteForm = () => {
-	const dispatch = useDispatch();
-
-	const handleNewAnecdote = (event) => {
+var timeoutID;
+const AnecdoteForm = (props) => {
+	const handleNewAnecdote = async (event) => {
 		event.preventDefault();
 		const content = event.target.anecdote.value;
 		event.target.anecdote.value = "";
-		dispatch(createAnecdote(content));
+		props.createAnecdote(content);
+		if (timeoutID !== null) {
+			window.clearTimeout(timeoutID);
+		}
+		props.notifyNewAnecdote(content);
+		timeoutID = setTimeout(() => {
+			props.clearNotification();
+			timeoutID = null;
+		}, 5000);
 	};
 
 	return (
@@ -25,4 +36,11 @@ const AnecdoteForm = () => {
 	);
 };
 
-export default AnecdoteForm;
+const mapDispatchToProps = {
+	createAnecdote,
+	notifyNewAnecdote,
+	clearNotification,
+};
+
+const ConnectedAnecdoteForm = connect(null, mapDispatchToProps)(AnecdoteForm);
+export default ConnectedAnecdoteForm;
